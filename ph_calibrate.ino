@@ -1,6 +1,6 @@
 #include "Kalman.h"; // бибилиотека фильтрации (стабилизации) измерений
-#include <SPI.h> // для работы с SD картой
-#include <SD.h> // для работы с SD картой
+// #include <SPI.h> // для работы с SD картой
+// #include <SD.h> // для работы с SD картой
 
 double measurement, filteredMeasurement, averageMeasurement; // измерения: прямое, фильтрованное и среднее за период
 Kalman myFilter(0.15,15,1023,0); // сам фильтр, параметры 0.15, 15 и 1023 - экспериментально подобраны
@@ -14,11 +14,11 @@ word count = 0; // счетчик для записи в массив после
 
 unsigned long doCalcWriteFuture = 0; // расчетное время расчитывать среднее и записывать на SD карту
 
-const word chipSelect = 53; // подключение SD шилда линия CS
+// const word chipSelect = 53; // подключение SD шилда линия CS
 const word ledPin = 2; // подключение светодиода индикации работы
 const word pHPin = 0; // подключение pH метра
 
-char dataFileName[50];
+// char dataFileName[50];
 
 void doMeasurement(void) { // измерение аналогового сигнала, фильтрация, заполнение массива последних измерений для последующего расчета среднего за период
   if (doMeasurementFuture <= millis()) { // настало время делать измерение 
@@ -29,7 +29,7 @@ void doMeasurement(void) { // измерение аналогового сигн
     filteredMeasurement = myFilter.getFilteredValue(measurement); // фильтрация измерения
     lastMeasurements[count] = filteredMeasurement; // запись очередного фильтрованного измерения в массив
 
-    if (count % 10 == 0) Serial.print("."); // вывод в отладочную консоль прогресс бар о том, что программа работает
+//    if (count % 10 == 0) Serial.print("."); // вывод в отладочную консоль прогресс бар о том, что программа работает
     count++; // подготовка к следуюущей записи
     if (count == lastMeasurementsNumber) count = 0; // если массив кончился, то начинаем записывать в него с начала (нумерация элементов массива с нуля)
   }
@@ -49,17 +49,19 @@ void doCalcWrite(void) {
     for (int i=0; i<lastMeasurementsNumber; i++) sum += lastMeasurements[i];
     averageMeasurement = sum / lastMeasurementsNumber;
     
-    Serial.println();
+/*    Serial.println();
     Serial.println(averageMeasurement); // вывод в отладочную консоль
 
     File dataFile = SD.open(dataFileName, FILE_WRITE); // открываем файл
     if (dataFile) { // если файл готов, записываем среднее значение и закрываем файл, чтобы данные точно записались на SD карту
       dataFile.println(averageMeasurement);
-      dataFile.close();
+*/
+    Serial.println(averageMeasurement);
+/*      dataFile.close();
     }
     else { // если проблема с SD картой, пишем ошибку в консоль
       Serial.println("Error with datalog file.");
-    }
+    } */
   }
 }
 
@@ -67,7 +69,7 @@ void setup() {
   Serial.begin(115200); // открываем консоль отладки
   
   Serial.println("\r\n\r\n");
-  Serial.print("Initializing SD card...");
+/*  Serial.print("Initializing SD card...");
   if (!SD.begin(chipSelect)) Serial.println(" Failed.\r\n\r\n"); // проверяем SD карту
   else Serial.println(" OK.\r\n\r\n");
 
@@ -79,7 +81,7 @@ void setup() {
       break;
     }
   }
-
+*/
   pinMode(ledPin, OUTPUT); // настраиваем пин светодиода
   noTone(ledPin); // и выключаем светодиод
 
